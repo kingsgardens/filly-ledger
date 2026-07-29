@@ -1,0 +1,19 @@
+{
+  "id": "seed-flameaway-rosalita",
+  "name": "Hip 156",
+  "sire": "Flameaway",
+  "dam": "Rosalita",
+  "foaled": "2025-01-22",
+  "price": 130000,
+  "ownership": "Partnership buy",
+  "sale": "Grovendale Sales, agent for William B. Harrigan",
+  "scores": {
+    "sire": 30,
+    "damSide": 25,
+    "cross": 13,
+    "market": 3
+  },
+  "notes": "Sister to G3 winner Seek and Destroy on the immediate family; 2nd dam Search and Seizure unraced but dam of 7 winners across 3 generations of black type (Tammy the Torpedo, Seek and Destroy, High Opinion). Flameaway (Scat Daddy) is a leading third-crop sire (Bear River G2, Dark Saffron 2x G1), 2026 fee $10,000. Bought at $130,000 — well above his ~$16-24K recent yearling average, so this was a full/competitive price rather than a value catch.",
+  "log": [],
+  "createdAt": 1785342050385
+}
