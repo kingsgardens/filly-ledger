@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Filly Ledger</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root{
+    --ink:#1C2118;
+    --turf:#2B3D30;
+    --turf-deep:#1D2A21;
+    --parchment:#ECE6D6;
+    --card:#F8F4E8;
+    --brass:#A9812E;
+    --brass-deep:#8A6A24;
+    --oxblood:#7A2732;
+    --green:#3F6E52;
+    --slate:#5B6259;
+    --line:#D8CFB2;
+    --shadow: 0 1px 2px rgba(28,33,24,0.06), 0 4px 14px rgba(28,33,24,0.05);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--parchment);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    padding:32px 20px 80px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important; animation:none !important;}
+  }
+
+  .wrap{max-width:1080px;margin:0 auto;}
+
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:20px;
+    flex-wrap:wrap;
+    border-bottom:2px solid var(--turf);
+    padding-bottom:18px;
+    margin-bottom:10px;
+  }
+  header h1{
+    font-family:'Libre Caslon Text',serif;
+    font-size:2.4rem;
+    margin:0 0 4px;
+    color:var(--turf);
+    letter-spacing:0.5px;
+  }
+  header p{
+    margin:0;
+    color:var(--slate);
+    font-size:0.95rem;
+  }
+  .header-actions{display:flex;gap:10px;align-items:center;}
+  .add-btn{
+    background:var(--turf);
+    color:var(--parchment);
+    border:none;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:0.9rem;
+    padding:12px 20px;
+    border-radius:3px;
+    cursor:pointer;
+    letter-spacing:0.3px;
+    box-shadow:var(--shadow);
+  }
+  .add-btn:hover{background:var(--turf-deep);}
+  .gear-btn{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--slate);
+    font-size:1rem;
+    padding:11px 13px;
+    border-radius:3px;
+    cursor:pointer;
+  }
+  .gear-btn:hover{border-color:var(--turf);color:var(--turf);}
+  .add-btn:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--brass); outline-offset:2px;
+  }
+
+  .conn-row{
+    display:flex;align-items:center;gap:7px;
+    font-size:0.78rem;color:var(--slate);
+    margin-bottom:28px;
+  }
+  .conn-dot{width:8px;height:8px;border-radius:50%;background:var(--slate);display:inline-block;}
+  .conn-dot.ok{background:var(--green);}
+  .conn-dot.err{background:var(--oxblood);}
+
+  .stats{
+    display:flex;
+    margin-bottom:28px;
+    border:1px solid var(--line);
+    background:var(--card);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  .stat{flex:1;padding:14px 18px;border-right:1px solid var(--line);}
+  .stat:last-child{border-right:none;}
+  .stat .num{font-family:'IBM Plex Mono',monospace;font-size:1.5rem;font-weight:600;color:var(--turf);display:block;}
+  .stat .lbl{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--slate);}
+
+  .empty{
+    text-align:center;padding:50px 24px;
+    border:1px dashed var(--line);border-radius:4px;color:var(--slate);
+  }
+  .empty h3{font-family:'Libre Caslon Text',serif;color:var(--turf);margin:0 0 10px;font-size:1.3rem;}
+  .empty p{margin:0 0 16px;font-size:0.92rem;line-height:1.5;}
+  .empty ol{text-align:left;max-width:460px;margin:0 auto 18px;font-size:0.88rem;line-height:1.6;color:var(--ink);}
+  .empty code{background:rgba(43,61,48,0.08);padding:1px 5px;border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:0.85em;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:20px;}
+
+  .card{
+    background:var(--card);border:1px solid var(--turf);
+    outline:1px solid var(--line);outline-offset:-5px;
+    border-radius:4px;padding:18px 18px 16px;box-shadow:var(--shadow);
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .lot-tag{
+    font-family:'IBM Plex Mono',monospace;font-size:0.72rem;letter-spacing:0.06em;
+    color:var(--brass-deep);border:1px solid var(--brass);padding:3px 8px;border-radius:2px;
+    background:rgba(169,129,46,0.08);white-space:nowrap;
+  }
+  .score-badge{font-family:'IBM Plex Mono',monospace;font-size:0.78rem;font-weight:600;padding:4px 9px;border-radius:2px;white-space:nowrap;}
+  .score-strong{background:rgba(63,110,82,0.14);color:var(--green);}
+  .score-watch{background:rgba(169,129,46,0.14);color:var(--brass-deep);}
+  .score-pass{background:rgba(91,98,89,0.14);color:var(--slate);}
+
+  .card h2{font-family:'Libre Caslon Text',serif;font-size:1.3rem;margin:0;color:var(--ink);}
+  .card h2 .x{font-style:italic;color:var(--slate);font-weight:400;font-size:1.05rem;}
+
+  .meta-row{font-size:0.82rem;color:var(--slate);display:flex;flex-wrap:wrap;gap:4px 14px;}
+  .meta-row span b{color:var(--ink);font-weight:600;}
+
+  .price-row{
+    display:flex;justify-content:space-between;align-items:center;
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:9px 0;
+  }
+  .price{font-family:'IBM Plex Mono',monospace;font-size:1.15rem;color:var(--oxblood);font-weight:600;}
+  .ownership{font-size:0.82rem;color:var(--slate);text-align:right;}
+
+  .notes-preview{font-size:0.86rem;color:var(--ink);line-height:1.45;}
+
+  details{margin-top:2px;}
+  summary{cursor:pointer;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--turf);font-weight:600;list-style:none;}
+  summary::-webkit-details-marker{display:none;}
+  summary:before{content:"▸ ";}
+  details[open] summary:before{content:"▾ ";}
+
+  .log-list{margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;}
+  .log-list li{font-size:0.83rem;border-left:2px solid var(--brass);padding-left:10px;}
+  .log-list li .d{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--slate);display:block;}
+  .log-add{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+  .log-add input[type=date]{width:140px;}
+  .log-add input[type=text]{flex:1;min-width:120px;}
+  .log-add input{font-family:'Inter',sans-serif;font-size:0.82rem;padding:6px 8px;border:1px solid var(--line);border-radius:3px;background:#fff;}
+  .log-add button{background:var(--turf);color:var(--parchment);border:none;padding:6px 12px;border-radius:3px;font-size:0.78rem;cursor:pointer;font-weight:600;}
+
+  .card-actions{display:flex;gap:14px;margin-top:auto;padding-top:8px;}
+  .card-actions button{background:none;border:none;color:var(--slate);font-size:0.78rem;cursor:pointer;padding:0;text-transform:uppercase;letter-spacing:0.06em;font-weight:600;}
+  .card-actions button:hover{color:var(--turf);}
+  .card-actions .del:hover{color:var(--oxblood);}
+
+  .overlay{position:fixed;inset:0;background:rgba(28,33,24,0.45);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;z-index:50;}
+  .modal{background:var(--card);border:1px solid var(--turf);border-radius:6px;max-width:560px;width:100%;padding:26px 28px 24px;box-shadow:0 12px 40px rgba(0,0,0,0.25);}
+  .modal h3{font-family:'Libre Caslon Text',serif;color:var(--turf);margin:0 0 6px;font-size:1.4rem;}
+  .modal .sub{font-size:0.85rem;color:var(--slate);margin:0 0 18px;line-height:1.5;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:0.76rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--slate);font-weight:600;margin-bottom:5px;}
+  .field input, .field textarea{width:100%;font-family:'Inter',sans-serif;font-size:0.92rem;padding:9px 11px;border:1px solid var(--line);border-radius:3px;background:#fff;color:var(--ink);}
+  .field textarea{resize:vertical;min-height:64px;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .four-col{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+  .score-total{margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:0.88rem;display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:3px;background:rgba(43,61,48,0.06);}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
+  .btn-secondary{background:none;border:1px solid var(--line);color:var(--slate);padding:10px 18px;border-radius:3px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;font-size:0.86rem;}
+  .btn-primary{background:var(--turf);color:var(--parchment);border:none;padding:10px 18px;border-radius:3px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;font-size:0.86rem;}
+  .btn-primary:hover{background:var(--turf-deep);}
+  .btn-primary[disabled]{opacity:0.6;cursor:default;}
+
+  .status-msg{text-align:center;color:var(--slate);font-size:0.85rem;padding:30px;}
+  .error-msg{text-align:center;color:var(--oxblood);font-size:0.85rem;padding:16px;border:1px solid var(--oxblood);border-radius:4px;background:rgba(122,39,50,0.06);margin-bottom:20px;}
+
+  @media (max-width:520px){
+    .two-col,.four-col{grid-template-columns:1fr 1fr;}
+    header{align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Filly Ledger</h1>
+      <p>Partnership yearlings — pedigree, price, and progress in one place.</p>
+    </div>
+    <div class="header-actions">
+      <button class="gear-btn" onclick="openSettings()" title="GitHub connection settings">⚙</button>
+      <button class="add-btn" id="addBtn" onclick="openForm()">+ Add filly</button>
+    </div>
+  </header>
+  <div class="conn-row" id="connRow"><span class="conn-dot"></span><span id="connText">Checking connection…</span></div>
+
+  <div class="stats" id="stats" style="display:none;">
+    <div class="stat"><span class="num" id="statCount">0</span><span class="lbl">Fillies logged</span></div>
+    <div class="stat"><span class="num" id="statInvested">$0</span><span class="lbl">Total invested</span></div>
+    <div class="stat"><span class="num" id="statAvg">–</span><span class="lbl">Avg. score</span></div>
+  </div>
+
+  <div id="content"><div class="status-msg">Loading ledger…</div></div>
+</div>
+
+<script>
+const LS_OWNER='flGhOwner', LS_REPO='flGhRepo', LS_BRANCH='flGhBranch', LS_PAT='flGhPat';
+let fillies = [];
+let editingId = null;
+
+function getConfig(){
+  return {
+    owner: localStorage.getItem(LS_OWNER) || '',
+    repo: localStorage.getItem(LS_REPO) || '',
+    branch: localStorage.getItem(LS_BRANCH) || 'main',
+    pat: localStorage.getItem(LS_PAT) || ''
+  };
+}
+function setConfig(cfg){
+  localStorage.setItem(LS_OWNER, cfg.owner);
+  localStorage.setItem(LS_REPO, cfg.repo);
+  localStorage.setItem(LS_BRANCH, cfg.branch || 'main');
+  localStorage.setItem(LS_PAT, cfg.pat);
+}
+function isConfigured(){ const c=getConfig(); return !!(c.owner && c.repo); }
+
+function toBase64(str){ return btoa(unescape(encodeURIComponent(str))); }
+
+function fmtMoney(n){ n=Number(n)||0; return '$'+n.toLocaleString('en-US'); }
+function scoreClass(t){ if(t>=75) return 'score-strong'; if(t>=60) return 'score-watch'; return 'score-pass'; }
+function scoreLabel(t){ if(t>=75) return 'Strong'; if(t>=60) return 'Watch'; return 'Pass'; }
+function scoreTotal(s){ return (Number(s.sire)||0)+(Number(s.damSide)||0)+(Number(s.cross)||0)+(Number(s.market)||0); }
+function esc(str){ const d=document.createElement('div'); d.textContent = str==null?'':String(str); return d.innerHTML; }
+
+function apiHeaders(cfg){
+  const h = {'Accept':'application/vnd.github+json'};
+  if(cfg.pat) h['Authorization'] = 'token '+cfg.pat;
+  return h;
+}
+
+async function ghListDataFiles(cfg){
+  const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/data?ref=${encodeURIComponent(cfg.branch)}`;
+  const res = await fetch(url, {headers: apiHeaders(cfg)});
+  if(res.status === 404) return [];
+  if(!res.ok) throw new Error('list failed ('+res.status+')');
+  const arr = await res.json();
+  return Array.isArray(arr) ? arr.filter(x=>x.name.endsWith('.json')) : [];
+}
+async function ghFetchRaw(downloadUrl){
+  const res = await fetch(downloadUrl);
+  if(!res.ok) throw new Error('fetch failed ('+res.status+')');
+  return res.json();
+}
+async function ghPutFile(cfg, path, obj, sha){
+  if(!cfg.pat) throw new Error('No GitHub token configured — open Settings to add one.');
+  const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`;
+  const body = { message: (sha?'Update ':'Add ')+path, content: toBase64(JSON.stringify(obj,null,2)), branch: cfg.branch };
+  if(sha) body.sha = sha;
+  const res = await fetch(url, {method:'PUT', headers:{...apiHeaders(cfg),'Content-Type':'application/json'}, body: JSON.stringify(body)});
+  if(!res.ok){ const t = await res.text(); throw new Error('save failed ('+res.status+'): '+t.slice(0,180)); }
+  return res.json();
+}
+async function ghDeleteFile(cfg, path, sha){
+  if(!cfg.pat) throw new Error('No GitHub token configured — open Settings to add one.');
+  const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`;
+  const res = await fetch(url, {method:'DELETE', headers:{...apiHeaders(cfg),'Content-Type':'application/json'}, body: JSON.stringify({message:'Delete '+path, sha, branch: cfg.branch})});
+  if(!res.ok){ const t = await res.text(); throw new Error('delete failed ('+res.status+'): '+t.slice(0,180)); }
+}
+
+function seedFilly(){
+  return {
+    id: 'seed-flameaway-rosalita',
+    name: 'Hip 156',
+    sire: 'Flameaway',
+    dam: 'Rosalita',
+    foaled: '2025-01-22',
+    price: 130000,
+    ownership: 'Partnership buy',
+    sale: 'Grovendale Sales, agent for William B. Harrigan',
+    scores: { sire: 30, damSide: 25, cross: 13, market: 3 },
+    notes: 'Sister to G3 winner Seek and Destroy on the immediate family; 2nd dam Search and Seizure unraced but dam of 7 winners across 3 generations of black type (Tammy the Torpedo, Seek and Destroy, High Opinion). Flameaway (Scat Daddy) is a leading third-crop sire (Bear River G2, Dark Saffron 2x G1), 2026 fee $10,000. Bought at $130,000 — well above his ~$16-24K recent yearling average, so this was a full/competitive price rather than a value catch.',
+    log: [],
+    createdAt: Date.now()
+  };
+}
+
+function setConn(state, text){
+  const dot = document.querySelector('#connRow .conn-dot');
+  dot.className = 'conn-dot' + (state==='ok'?' ok':state==='err'?' err':'');
+  document.getElementById('connText').textContent = text;
+}
+
+async function loadData(){
+  const cfg = getConfig();
+  if(!isConfigured()){
+    setConn('', 'Not connected — click ⚙ to link a GitHub repo');
+    document.getElementById('addBtn').setAttribute('disabled','disabled');
+    renderNeedsSetup();
+    return;
+  }
+  document.getElementById('addBtn').removeAttribute('disabled');
+  document.getElementById('content').innerHTML = '<div class="status-msg">Loading from GitHub…</div>';
+  try{
+    const files = await ghListDataFiles(cfg);
+    if(files.length === 0){
+      if(cfg.pat){
+        try{
+          const seed = seedFilly();
+          const path = 'data/'+seed.id+'.json';
+          const result = await ghPutFile(cfg, path, seed);
+          fillies = [{...seed, _path: path, _sha: result.content.sha}];
+        }catch(e){ fillies = []; }
+      } else {
+        fillies = [];
+      }
+    } else {
+      fillies = await Promise.all(files.map(async f=>{
+        const obj = await ghFetchRaw(f.download_url);
+        return {...obj, _path: f.path, _sha: f.sha};
+      }));
+    }
+    setConn('ok', 'Connected to '+cfg.owner+'/'+cfg.repo+' ('+cfg.branch+')');
+    render();
+  }catch(e){
+    setConn('err', 'Connection error: '+e.message);
+    document.getElementById('content').innerHTML = '<div class="error-msg">Could not load the ledger from GitHub: '+esc(e.message)+'<br>Check the repo name and token in Settings.</div>';
+  }
+}
+
+function renderNeedsSetup(){
+  document.getElementById('stats').style.display = 'none';
+  document.getElementById('content').innerHTML = `
+    <div class="empty">
+      <h3>Connect this ledger to GitHub</h3>
+      <p>Fillies are stored as JSON files in a repo's <code>/data</code> folder, so this page can be hosted on GitHub Pages and stay in sync every time it loads.</p>
+      <ol>
+        <li>Create a public repo (e.g. <code>kingsgardens/filly-ledger</code>) and enable Pages from the main branch.</li>
+        <li>Add this file to the repo as <code>index.html</code> — for a file this size, paste it directly in the GitHub web editor rather than the API uploader, to avoid truncation.</li>
+        <li>Click <b>⚙ Settings</b> above and enter the repo owner/name and a personal access token with repo scope.</li>
+      </ol>
+      <button class="add-btn" onclick="openSettings()">⚙ Open Settings</button>
+    </div>`;
+}
+
+function render(){
+  const content = document.getElementById('content');
+  const stats = document.getElementById('stats');
+  if(fillies.length === 0){
+    stats.style.display = 'none';
+    content.innerHTML = `
+      <div class="empty">
+        <p>No fillies logged yet — add the first one from a hip you've bought.</p>
+        <button class="add-btn" onclick="openForm()">+ Add filly</button>
+      </div>`;
+    return;
+  }
+  stats.style.display = 'flex';
+  document.getElementById('statCount').textContent = fillies.length;
+  document.getElementById('statInvested').textContent = fmtMoney(fillies.reduce((a,f)=>a+(Number(f.price)||0),0));
+  const avg = Math.round(fillies.reduce((a,f)=>a+scoreTotal(f.scores),0)/fillies.length);
+  document.getElementById('statAvg').textContent = avg;
+
+  const sorted = [...fillies].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  content.innerHTML = `<div class="grid">${sorted.map((f,idx)=>cardHtml(f, sorted.length-idx)).join('')}</div>`;
+}
+
+function cardHtml(f, lotNum){
+  const total = scoreTotal(f.scores);
+  const logItems = (f.log||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  return `
+  <div class="card">
+    <div class="card-top">
+      <span class="lot-tag">LOT ${String(lotNum).padStart(2,'0')}</span>
+      <span class="score-badge ${scoreClass(total)}">${total}/100 · ${scoreLabel(total)}</span>
+    </div>
+    <h2>${esc(f.sire)} <span class="x">×</span> ${esc(f.dam)}</h2>
+    <div class="meta-row">
+      <span><b>${esc(f.name||'—')}</b></span>
+      ${f.foaled?`<span>Foaled ${esc(f.foaled)}</span>`:''}
+    </div>
+    ${f.sale?`<div class="meta-row"><span>${esc(f.sale)}</span></div>`:''}
+    <div class="price-row">
+      <span class="price">${fmtMoney(f.price)}</span>
+      <span class="ownership">${esc(f.ownership||'')}</span>
+    </div>
+    ${f.notes?`<div class="notes-preview">${esc(f.notes)}</div>`:''}
+    <details>
+      <summary>Workouts &amp; past performances (${(f.log||[]).length})</summary>
+      <ul class="log-list">
+        ${logItems.length? logItems.map(l=>`<li><span class="d">${esc(l.date)}</span>${esc(l.text)}</li>`).join('') : '<li style="border:none;padding-left:0;color:var(--slate);">No entries yet — add them once she starts training or racing.</li>'}
+      </ul>
+      <div class="log-add">
+        <input type="date" id="logDate-${f.id}">
+        <input type="text" id="logText-${f.id}" placeholder="e.g. 4f bullet work, Keeneland">
+        <button onclick="addLog('${f.id}')">Add entry</button>
+      </div>
+    </details>
+    <div class="card-actions">
+      <button onclick="openForm('${f.id}')">Edit</button>
+      <button class="del" onclick="deleteFilly('${f.id}')">Delete</button>
+    </div>
+  </div>`;
+}
+
+function stripInternal(obj){
+  const { _path, _sha, ...clean } = obj;
+  return clean;
+}
+
+async function addLog(id){
+  const dateEl = document.getElementById('logDate-'+id);
+  const textEl = document.getElementById('logText-'+id);
+  const date = dateEl.value, text = textEl.value.trim();
+  if(!date || !text) return;
+  const cfg = getConfig();
+  const f = fillies.find(x=>x.id===id);
+  if(!f) return;
+  const updated = {...f, log: [...(f.log||[]), {date, text}]};
+  try{
+    const result = await ghPutFile(cfg, f._path, stripInternal(updated), f._sha);
+    f.log = updated.log;
+    f._sha = result.content.sha;
+    render();
+  }catch(e){ alert('Could not save the log entry: '+e.message); }
+}
+
+async function deleteFilly(id){
+  if(!confirm('Delete this filly from the ledger? This removes the file from GitHub and cannot be undone.')) return;
+  const cfg = getConfig();
+  const f = fillies.find(x=>x.id===id);
+  try{
+    await ghDeleteFile(cfg, f._path, f._sha);
+    fillies = fillies.filter(x=>x.id!==id);
+    render();
+  }catch(e){ alert('Could not delete: '+e.message); }
+}
+
+function openForm(id){
+  editingId = id || null;
+  const f = id ? fillies.find(x=>x.id===id) : null;
+  const s = f ? f.scores : {sire:'',damSide:'',cross:'',market:''};
+
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  overlay.id = 'formOverlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      <h3>${f? 'Edit filly' : 'Add a filly'}</h3>
+      <div class="two-col">
+        <div class="field"><label>Sire</label><input id="fSire" value="${f?esc(f.sire):''}"></div>
+        <div class="field"><label>Dam</label><input id="fDam" value="${f?esc(f.dam):''}"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>Name / working ID</label><input id="fName" placeholder="e.g. Hip 156" value="${f?esc(f.name):''}"></div>
+        <div class="field"><label>Foaled</label><input type="date" id="fFoaled" value="${f?esc(f.foaled):''}"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>Purchase price ($)</label><input type="number" id="fPrice" value="${f?f.price:''}"></div>
+        <div class="field"><label>Your share / partnership note</label><input id="fOwnership" value="${f?esc(f.ownership):''}"></div>
+      </div>
+      <div class="field"><label>Sale &amp; consignor</label><input id="fSale" value="${f?esc(f.sale):''}"></div>
+      <div class="field"><label>Pedigree notes</label><textarea id="fNotes">${f?esc(f.notes):''}</textarea></div>
+      <div class="field">
+        <label>Scoring (Sire 0–40 · Dam Side 0–40 · Cross 0–20 · Market 0–10)</label>
+        <div class="four-col">
+          <input type="number" min="0" max="40" id="sSire" placeholder="Sire" value="${s.sire}" oninput="updateTotal()">
+          <input type="number" min="0" max="40" id="sDamSide" placeholder="Dam side" value="${s.damSide}" oninput="updateTotal()">
+          <input type="number" min="0" max="20" id="sCross" placeholder="Cross" value="${s.cross}" oninput="updateTotal()">
+          <input type="number" min="0" max="10" id="sMarket" placeholder="Market" value="${s.market}" oninput="updateTotal()">
+        </div>
+        <div class="score-total"><span>Total</span><span id="totalDisplay">0 / 100</span></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeForm()">Cancel</button>
+        <button class="btn-primary" id="saveBtn" onclick="submitForm()">Save filly</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  updateTotal();
+  document.getElementById('fSire').focus();
+}
+
+function updateTotal(){
+  const sire=Number(document.getElementById('sSire').value)||0;
+  const damSide=Number(document.getElementById('sDamSide').value)||0;
+  const cross=Number(document.getElementById('sCross').value)||0;
+  const market=Number(document.getElementById('sMarket').value)||0;
+  const total=sire+damSide+cross+market;
+  document.getElementById('totalDisplay').textContent = total+' / 100 · '+scoreLabel(total);
+}
+
+function closeForm(){ const o=document.getElementById('formOverlay'); if(o) o.remove(); editingId=null; }
+
+async function submitForm(){
+  const cfg = getConfig();
+  const data = {
+    sire: document.getElementById('fSire').value.trim(),
+    dam: document.getElementById('fDam').value.trim(),
+    name: document.getElementById('fName').value.trim(),
+    foaled: document.getElementById('fFoaled').value,
+    price: Number(document.getElementById('fPrice').value)||0,
+    ownership: document.getElementById('fOwnership').value.trim(),
+    sale: document.getElementById('fSale').value.trim(),
+    notes: document.getElementById('fNotes').value.trim(),
+    scores: {
+      sire: Number(document.getElementById('sSire').value)||0,
+      damSide: Number(document.getElementById('sDamSide').value)||0,
+      cross: Number(document.getElementById('sCross').value)||0,
+      market: Number(document.getElementById('sMarket').value)||0,
+    }
+  };
+  if(!data.sire && !data.dam){ alert('Add at least a sire or dam before saving.'); return; }
+
+  const saveBtn = document.getElementById('saveBtn');
+  saveBtn.setAttribute('disabled','disabled'); saveBtn.textContent = 'Saving…';
+  try{
+    if(editingId){
+      const f = fillies.find(x=>x.id===editingId);
+      const merged = {...f, ...data};
+      const result = await ghPutFile(cfg, f._path, stripInternal(merged), f._sha);
+      Object.assign(f, data, {_sha: result.content.sha});
+    } else {
+      const id = 'f-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
+      const path = 'data/'+id+'.json';
+      const clean = {id, ...data, log:[], createdAt: Date.now()};
+      const result = await ghPutFile(cfg, path, clean);
+      fillies.push({...clean, _path: path, _sha: result.content.sha});
+    }
+    closeForm();
+    render();
+  }catch(e){
+    alert('Could not save to GitHub: '+e.message);
+    saveBtn.removeAttribute('disabled'); saveBtn.textContent = 'Save filly';
+  }
+}
+
+function openSettings(){
+  const cfg = getConfig();
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  overlay.id = 'settingsOverlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      <h3>GitHub connection</h3>
+      <p class="sub">Data lives as JSON files in this repo's <code>/data</code> folder. Your token is stored only in this browser's local storage and used to talk directly to GitHub — it's never sent anywhere else.</p>
+      <div class="two-col">
+        <div class="field"><label>Repo owner / org</label><input id="cfgOwner" value="${esc(cfg.owner||'kingsgardens')}"></div>
+        <div class="field"><label>Repo name</label><input id="cfgRepo" value="${esc(cfg.repo||'filly-ledger')}"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>Branch</label><input id="cfgBranch" value="${esc(cfg.branch||'main')}"></div>
+        <div class="field"><label>Personal access token</label><input id="cfgPat" type="password" value="${esc(cfg.pat)}" placeholder="repo-scope PAT"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeSettings()">Cancel</button>
+        <button class="btn-primary" onclick="saveSettings()">Save connection</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  document.getElementById('cfgOwner').focus();
+}
+function closeSettings(){ const o=document.getElementById('settingsOverlay'); if(o) o.remove(); }
+function saveSettings(){
+  setConfig({
+    owner: document.getElementById('cfgOwner').value.trim(),
+    repo: document.getElementById('cfgRepo').value.trim(),
+    branch: document.getElementById('cfgBranch').value.trim() || 'main',
+    pat: document.getElementById('cfgPat').value.trim()
+  });
+  closeSettings();
+  loadData();
+}
+
+loadData();
+</script>
+</body>
+</html>
