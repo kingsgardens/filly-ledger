@@ -45,7 +45,7 @@
     flex-wrap:wrap;
     border-bottom:2px solid var(--turf);
     padding-bottom:18px;
-    margin-bottom:10px;
+    margin-bottom:16px;
   }
   header h1{
     font-family:'Libre Caslon Text',serif;
@@ -91,11 +91,27 @@
   .conn-row{
     display:flex;align-items:center;gap:7px;
     font-size:0.78rem;color:var(--slate);
-    margin-bottom:28px;
+    margin-bottom:20px;
   }
   .conn-dot{width:8px;height:8px;border-radius:50%;background:var(--slate);display:inline-block;}
   .conn-dot.ok{background:var(--green);}
   .conn-dot.err{background:var(--oxblood);}
+
+  .tabs-row{display:flex;gap:8px;margin-bottom:24px;}
+  .tab-btn{
+    background:none;
+    border:1px solid var(--turf);
+    color:var(--turf);
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:0.85rem;
+    padding:9px 18px;
+    border-radius:20px;
+    cursor:pointer;
+    letter-spacing:0.2px;
+  }
+  .tab-btn.active{background:var(--turf);color:var(--parchment);}
+  .tab-btn:not(.active):hover{background:rgba(43,61,48,0.08);}
 
   .stats{
     display:flex;
@@ -137,6 +153,7 @@
   .score-strong{background:rgba(63,110,82,0.14);color:var(--green);}
   .score-watch{background:rgba(169,129,46,0.14);color:var(--brass-deep);}
   .score-pass{background:rgba(91,98,89,0.14);color:var(--slate);}
+  .score-none{background:rgba(91,98,89,0.08);color:var(--slate);}
 
   .card h2{font-family:'Libre Caslon Text',serif;font-size:1.3rem;margin:0;color:var(--ink);}
   .card h2 .x{font-style:italic;color:var(--slate);font-weight:400;font-size:1.05rem;}
@@ -179,7 +196,7 @@
   .modal .sub{font-size:0.85rem;color:var(--slate);margin:0 0 18px;line-height:1.5;}
   .field{margin-bottom:14px;}
   .field label{display:block;font-size:0.76rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--slate);font-weight:600;margin-bottom:5px;}
-  .field input, .field textarea{width:100%;font-family:'Inter',sans-serif;font-size:0.92rem;padding:9px 11px;border:1px solid var(--line);border-radius:3px;background:#fff;color:var(--ink);}
+  .field input, .field textarea, .field select{width:100%;font-family:'Inter',sans-serif;font-size:0.92rem;padding:9px 11px;border:1px solid var(--line);border-radius:3px;background:#fff;color:var(--ink);}
   .field textarea{resize:vertical;min-height:64px;}
   .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
   .four-col{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
@@ -213,6 +230,11 @@
   </header>
   <div class="conn-row" id="connRow"><span class="conn-dot"></span><span id="connText">Checking connection…</span></div>
 
+  <div class="tabs-row">
+    <button class="tab-btn" id="tabBtn2026" onclick="setCohort('2026')">2026 Purchases</button>
+    <button class="tab-btn" id="tabBtn2024" onclick="setCohort('2024')">2024 Purchases</button>
+  </div>
+
   <div class="stats" id="stats" style="display:none;">
     <div class="stat"><span class="num" id="statCount">0</span><span class="lbl">Fillies logged</span></div>
     <div class="stat"><span class="num" id="statInvested">$0</span><span class="lbl">Total invested</span></div>
@@ -226,6 +248,7 @@
 const LS_OWNER='flGhOwner', LS_REPO='flGhRepo', LS_BRANCH='flGhBranch', LS_PAT='flGhPat';
 let fillies = [];
 let editingId = null;
+let activeCohort = '2026';
 
 function getConfig(){
   return {
@@ -246,10 +269,12 @@ function isConfigured(){ const c=getConfig(); return !!(c.owner && c.repo); }
 function toBase64(str){ return btoa(unescape(encodeURIComponent(str))); }
 
 function fmtMoney(n){ n=Number(n)||0; return '$'+n.toLocaleString('en-US'); }
-function scoreClass(t){ if(t>=75) return 'score-strong'; if(t>=60) return 'score-watch'; return 'score-pass'; }
-function scoreLabel(t){ if(t>=75) return 'Strong'; if(t>=60) return 'Watch'; return 'Pass'; }
+function hasScore(s){ return (Number(s.sire)||0)+(Number(s.damSide)||0)+(Number(s.cross)||0)+(Number(s.market)||0) > 0; }
+function scoreClass(t,has){ if(!has) return 'score-none'; if(t>=75) return 'score-strong'; if(t>=60) return 'score-watch'; return 'score-pass'; }
+function scoreLabel(t,has){ if(!has) return 'Not scored'; if(t>=75) return 'Strong'; if(t>=60) return 'Watch'; return 'Pass'; }
 function scoreTotal(s){ return (Number(s.sire)||0)+(Number(s.damSide)||0)+(Number(s.cross)||0)+(Number(s.market)||0); }
 function esc(str){ const d=document.createElement('div'); d.textContent = str==null?'':String(str); return d.innerHTML; }
+function cohortOf(f){ return f.cohort || '2026'; }
 
 function apiHeaders(cfg){
   const h = {'Accept':'application/vnd.github+json'};
@@ -286,21 +311,66 @@ async function ghDeleteFile(cfg, path, sha){
   if(!res.ok){ const t = await res.text(); throw new Error('delete failed ('+res.status+'): '+t.slice(0,180)); }
 }
 
-function seedFilly(){
-  return {
-    id: 'seed-flameaway-rosalita',
-    name: 'Hip 156',
-    sire: 'Flameaway',
-    dam: 'Rosalita',
-    foaled: '2025-01-22',
-    price: 130000,
-    ownership: 'Partnership buy',
-    sale: 'Grovendale Sales, agent for William B. Harrigan',
-    scores: { sire: 30, damSide: 25, cross: 13, market: 3 },
-    notes: 'Sister to G3 winner Seek and Destroy on the immediate family; 2nd dam Search and Seizure unraced but dam of 7 winners across 3 generations of black type (Tammy the Torpedo, Seek and Destroy, High Opinion). Flameaway (Scat Daddy) is a leading third-crop sire (Bear River G2, Dark Saffron 2x G1), 2026 fee $10,000. Bought at $130,000 — well above his ~$16-24K recent yearling average, so this was a full/competitive price rather than a value catch.',
-    log: [],
-    createdAt: Date.now()
-  };
+function seedFillies(){
+  return [
+    {
+      id: 'seed-flameaway-rosalita', cohort: '2026',
+      name: 'Hip 156', sire: 'Flameaway', dam: 'Rosalita', foaled: '2025-01-22',
+      price: 130000, ownership: 'Partnership buy',
+      sale: 'Grovendale Sales, agent for William B. Harrigan',
+      scores: { sire: 30, damSide: 25, cross: 13, market: 3 },
+      notes: 'Sister to G3 winner Seek and Destroy on the immediate family; 2nd dam Search and Seizure unraced but dam of 7 winners across 3 generations of black type (Tammy the Torpedo, Seek and Destroy, High Opinion). Flameaway (Scat Daddy) is a leading third-crop sire (Bear River G2, Dark Saffron 2x G1), 2026 fee $10,000. Bought at $130,000 — well above his ~$16-24K recent yearling average, so this was a full/competitive price rather than a value catch.',
+      log: [], createdAt: 1755000000000
+    },
+    {
+      id: 'seed-east-jabip', cohort: '2024',
+      name: 'East Jabip (IRE)', sire: 'Mehmas', dam: 'Bandiuc Eile (IRE)', foaled: '2023-03-21',
+      price: 0, ownership: 'Blue Bird Stables, Eclipse Thoroughbred Partners, and Ken T. Reimer (partnership)',
+      sale: 'Bred by J.S. Bolger; consigned by Boherguy Stud; sold to Blue Bird Stables',
+      scores: { sire: 0, damSide: 0, cross: 0, market: 0 },
+      notes: 'By Mehmas out of Bandiuc Eile (IRE), by New Approach (IRE). Trainer Brian A. Lynch, jockey Tyler Gaffalione. Best class achieved: stakes placed. Career: 5 starts, 2-1-0, $141,244 (all in 2026). Purchase price not shown on Equibase — add it if known.',
+      log: [
+        {date:'2026-02-26', text:'Gulfstream Park, Maiden Special Weight — won'},
+        {date:'2026-04-09', text:'Keeneland, Allowance — won'},
+        {date:'2026-05-13', text:'Horseshoe Indianapolis, Cleopatra Handicap (Black Type) — 5th'},
+        {date:'2026-06-27', text:'Churchill Downs, Tepin Stakes (Listed) — 2nd'},
+        {date:'2026-08-02', text:'Ellis Park, Pucker Up S. presented by Ag Revolution (Listed) — 4th'}
+      ],
+      createdAt: 1756000000000
+    },
+    {
+      id: 'seed-ontology', cohort: '2024',
+      name: 'Ontology (KY)', sire: "Kitten's Joy", dam: 'Hidden Message', foaled: '2023-05-09',
+      price: 0, ownership: 'Blue Bird Stables (partnership)',
+      sale: 'Bred by Qatar Racing, LLC; consigned by Hunter Valley Farm; sold to Blue Bird Stables',
+      scores: { sire: 0, damSide: 0, cross: 0, market: 0 },
+      notes: "By Kitten's Joy out of Hidden Message, by Scat Daddy. Trainer Kevin Attard. Career: 8 starts, 2-0-2, $87,663. Purchase price not shown on Equibase — add it if known.",
+      log: [
+        {date:'2025-08-03', text:'Ellis Park, Maiden Special Weight — 5th'},
+        {date:'2025-08-30', text:'Kentucky Downs, Maiden Special Weight — 7th'},
+        {date:'2025-11-29', text:'Fair Grounds, Maiden Special Weight — 3rd'},
+        {date:'2026-01-03', text:'Fair Grounds, Maiden Special Weight — 3rd'},
+        {date:'2026-01-31', text:'Fair Grounds, Maiden Special Weight — won'},
+        {date:'2026-03-07', text:'Fair Grounds, Allen Black Cat LaCombe Memorial Stakes (Black Type) — 8th'},
+        {date:'2026-07-30', text:'Woodbine, Allowance Optional Claiming — 5th'},
+        {date:'2026-08-22', text:'Woodbine, Allowance Optional Claiming — won'}
+      ],
+      createdAt: 1757000000000
+    },
+    {
+      id: 'seed-weetamoo', cohort: '2024',
+      name: 'Weetamoo (KY)', sire: 'Lexitonian', dam: 'Indian Princess', foaled: '2023-02-12',
+      price: 0, ownership: 'Blue Bird Stables (partnership)',
+      sale: 'Bred by Mercedes Stables LLC; consigned by Burleson Farms; sold to Blue Bird Stables',
+      scores: { sire: 0, damSide: 0, cross: 0, market: 0 },
+      notes: 'By Lexitonian out of Indian Princess, by Indian Charlie. Trainer Todd A. Pletcher. Career: 2 starts, 1-0-0, $51,404. Purchase price not shown on Equibase — add it if known.',
+      log: [
+        {date:'2026-03-01', text:'Gulfstream Park, Maiden Special Weight — 5th'},
+        {date:'2026-04-17', text:'Keeneland, Maiden Special Weight — won'}
+      ],
+      createdAt: 1758000000000
+    }
+  ];
 }
 
 function setConn(state, text){
@@ -309,8 +379,15 @@ function setConn(state, text){
   document.getElementById('connText').textContent = text;
 }
 
+function updateTabButtons(){
+  document.getElementById('tabBtn2026').className = 'tab-btn' + (activeCohort==='2026'?' active':'');
+  document.getElementById('tabBtn2024').className = 'tab-btn' + (activeCohort==='2024'?' active':'');
+}
+function setCohort(c){ activeCohort = c; updateTabButtons(); render(); }
+
 async function loadData(){
   const cfg = getConfig();
+  updateTabButtons();
   if(!isConfigured()){
     setConn('', 'Not connected — click ⚙ to link a GitHub repo');
     document.getElementById('addBtn').setAttribute('disabled','disabled');
@@ -321,22 +398,20 @@ async function loadData(){
   document.getElementById('content').innerHTML = '<div class="status-msg">Loading from GitHub…</div>';
   try{
     const files = await ghListDataFiles(cfg);
-    if(files.length === 0){
-      if(cfg.pat){
+    fillies = await Promise.all(files.map(async f=>{
+      const obj = await ghFetchRaw(f.download_url);
+      return {...obj, _path: f.path, _sha: f.sha};
+    }));
+    if(cfg.pat){
+      const existingIds = new Set(fillies.map(f=>f.id));
+      for(const seed of seedFillies()){
+        if(existingIds.has(seed.id)) continue;
         try{
-          const seed = seedFilly();
           const path = 'data/'+seed.id+'.json';
           const result = await ghPutFile(cfg, path, seed);
-          fillies = [{...seed, _path: path, _sha: result.content.sha}];
-        }catch(e){ fillies = []; }
-      } else {
-        fillies = [];
+          fillies.push({...seed, _path: path, _sha: result.content.sha});
+        }catch(e){ /* skip silently, will retry next load */ }
       }
-    } else {
-      fillies = await Promise.all(files.map(async f=>{
-        const obj = await ghFetchRaw(f.download_url);
-        return {...obj, _path: f.path, _sha: f.sha};
-      }));
     }
     setConn('ok', 'Connected to '+cfg.owner+'/'+cfg.repo+' ('+cfg.branch+')');
     render();
@@ -364,33 +439,36 @@ function renderNeedsSetup(){
 function render(){
   const content = document.getElementById('content');
   const stats = document.getElementById('stats');
-  if(fillies.length === 0){
+  const visible = fillies.filter(f => cohortOf(f) === activeCohort);
+
+  if(visible.length === 0){
     stats.style.display = 'none';
     content.innerHTML = `
       <div class="empty">
-        <p>No fillies logged yet — add the first one from a hip you've bought.</p>
+        <p>No fillies logged yet in ${activeCohort} Purchases — add the first one.</p>
         <button class="add-btn" onclick="openForm()">+ Add filly</button>
       </div>`;
     return;
   }
   stats.style.display = 'flex';
-  document.getElementById('statCount').textContent = fillies.length;
-  document.getElementById('statInvested').textContent = fmtMoney(fillies.reduce((a,f)=>a+(Number(f.price)||0),0));
-  const avg = Math.round(fillies.reduce((a,f)=>a+scoreTotal(f.scores),0)/fillies.length);
-  document.getElementById('statAvg').textContent = avg;
+  document.getElementById('statCount').textContent = visible.length;
+  document.getElementById('statInvested').textContent = fmtMoney(visible.reduce((a,f)=>a+(Number(f.price)||0),0));
+  const scored = visible.filter(f=>hasScore(f.scores));
+  document.getElementById('statAvg').textContent = scored.length ? Math.round(scored.reduce((a,f)=>a+scoreTotal(f.scores),0)/scored.length) : '–';
 
-  const sorted = [...fillies].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  const sorted = [...visible].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   content.innerHTML = `<div class="grid">${sorted.map((f,idx)=>cardHtml(f, sorted.length-idx)).join('')}</div>`;
 }
 
 function cardHtml(f, lotNum){
   const total = scoreTotal(f.scores);
+  const has = hasScore(f.scores);
   const logItems = (f.log||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
   return `
   <div class="card">
     <div class="card-top">
       <span class="lot-tag">LOT ${String(lotNum).padStart(2,'0')}</span>
-      <span class="score-badge ${scoreClass(total)}">${total}/100 · ${scoreLabel(total)}</span>
+      <span class="score-badge ${scoreClass(total,has)}">${has ? total+'/100 · '+scoreLabel(total,has) : 'Not scored'}</span>
     </div>
     <h2>${esc(f.sire)} <span class="x">×</span> ${esc(f.dam)}</h2>
     <div class="meta-row">
@@ -399,7 +477,7 @@ function cardHtml(f, lotNum){
     </div>
     ${f.sale?`<div class="meta-row"><span>${esc(f.sale)}</span></div>`:''}
     <div class="price-row">
-      <span class="price">${fmtMoney(f.price)}</span>
+      <span class="price">${f.price ? fmtMoney(f.price) : 'Price n/a'}</span>
       <span class="ownership">${esc(f.ownership||'')}</span>
     </div>
     ${f.notes?`<div class="notes-preview">${esc(f.notes)}</div>`:''}
@@ -458,6 +536,7 @@ function openForm(id){
   editingId = id || null;
   const f = id ? fillies.find(x=>x.id===id) : null;
   const s = f ? f.scores : {sire:'',damSide:'',cross:'',market:''};
+  const cohort = f ? cohortOf(f) : activeCohort;
 
   const overlay = document.createElement('div');
   overlay.className = 'overlay';
@@ -465,6 +544,13 @@ function openForm(id){
   overlay.innerHTML = `
     <div class="modal">
       <h3>${f? 'Edit filly' : 'Add a filly'}</h3>
+      <div class="field">
+        <label>Purchase group</label>
+        <select id="fCohort">
+          <option value="2026" ${cohort==='2026'?'selected':''}>2026 Purchases</option>
+          <option value="2024" ${cohort==='2024'?'selected':''}>2024 Purchases</option>
+        </select>
+      </div>
       <div class="two-col">
         <div class="field"><label>Sire</label><input id="fSire" value="${f?esc(f.sire):''}"></div>
         <div class="field"><label>Dam</label><input id="fDam" value="${f?esc(f.dam):''}"></div>
@@ -480,14 +566,14 @@ function openForm(id){
       <div class="field"><label>Sale &amp; consignor</label><input id="fSale" value="${f?esc(f.sale):''}"></div>
       <div class="field"><label>Pedigree notes</label><textarea id="fNotes">${f?esc(f.notes):''}</textarea></div>
       <div class="field">
-        <label>Scoring (Sire 0–40 · Dam Side 0–40 · Cross 0–20 · Market 0–10)</label>
+        <label>Scoring (Sire 0–40 · Dam Side 0–40 · Cross 0–20 · Market 0–10) — leave blank if not scored</label>
         <div class="four-col">
           <input type="number" min="0" max="40" id="sSire" placeholder="Sire" value="${s.sire}" oninput="updateTotal()">
           <input type="number" min="0" max="40" id="sDamSide" placeholder="Dam side" value="${s.damSide}" oninput="updateTotal()">
           <input type="number" min="0" max="20" id="sCross" placeholder="Cross" value="${s.cross}" oninput="updateTotal()">
           <input type="number" min="0" max="10" id="sMarket" placeholder="Market" value="${s.market}" oninput="updateTotal()">
         </div>
-        <div class="score-total"><span>Total</span><span id="totalDisplay">0 / 100</span></div>
+        <div class="score-total"><span>Total</span><span id="totalDisplay">Not scored</span></div>
       </div>
       <div class="modal-actions">
         <button class="btn-secondary" onclick="closeForm()">Cancel</button>
@@ -501,12 +587,15 @@ function openForm(id){
 }
 
 function updateTotal(){
-  const sire=Number(document.getElementById('sSire').value)||0;
-  const damSide=Number(document.getElementById('sDamSide').value)||0;
-  const cross=Number(document.getElementById('sCross').value)||0;
-  const market=Number(document.getElementById('sMarket').value)||0;
-  const total=sire+damSide+cross+market;
-  document.getElementById('totalDisplay').textContent = total+' / 100 · '+scoreLabel(total);
+  const sVals={
+    sire:Number(document.getElementById('sSire').value)||0,
+    damSide:Number(document.getElementById('sDamSide').value)||0,
+    cross:Number(document.getElementById('sCross').value)||0,
+    market:Number(document.getElementById('sMarket').value)||0
+  };
+  const total=sVals.sire+sVals.damSide+sVals.cross+sVals.market;
+  const has = hasScore(sVals);
+  document.getElementById('totalDisplay').textContent = has ? (total+' / 100 · '+scoreLabel(total,has)) : 'Not scored';
 }
 
 function closeForm(){ const o=document.getElementById('formOverlay'); if(o) o.remove(); editingId=null; }
@@ -514,6 +603,7 @@ function closeForm(){ const o=document.getElementById('formOverlay'); if(o) o.re
 async function submitForm(){
   const cfg = getConfig();
   const data = {
+    cohort: document.getElementById('fCohort').value,
     sire: document.getElementById('fSire').value.trim(),
     dam: document.getElementById('fDam').value.trim(),
     name: document.getElementById('fName').value.trim(),
