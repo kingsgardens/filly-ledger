@@ -1,0 +1,41 @@
+{
+  "id": "seed-east-jabip",
+  "cohort": "2024",
+  "name": "East Jabip (IRE)",
+  "sire": "Mehmas",
+  "dam": "Bandiuc Eile (IRE)",
+  "foaled": "2023-03-21",
+  "price": 0,
+  "ownership": "Blue Bird Stables, Eclipse Thoroughbred Partners, and Ken T. Reimer (partnership)",
+  "sale": "Bred by J.S. Bolger; consigned by Boherguy Stud; sold to Blue Bird Stables",
+  "scores": {
+    "sire": 0,
+    "damSide": 0,
+    "cross": 0,
+    "market": 0
+  },
+  "notes": "By Mehmas out of Bandiuc Eile (IRE), by New Approach (IRE). Trainer Brian A. Lynch, jockey Tyler Gaffalione. Best class achieved: stakes placed. Career: 5 starts, 2-1-0, $141,244 (all in 2026). Purchase price not shown on Equibase — add it if known.",
+  "log": [
+    {
+      "date": "2026-02-26",
+      "text": "Gulfstream Park, Maiden Special Weight — won"
+    },
+    {
+      "date": "2026-04-09",
+      "text": "Keeneland, Allowance — won"
+    },
+    {
+      "date": "2026-05-13",
+      "text": "Horseshoe Indianapolis, Cleopatra Handicap (Black Type) — 5th"
+    },
+    {
+      "date": "2026-06-27",
+      "text": "Churchill Downs, Tepin Stakes (Listed) — 2nd"
+    },
+    {
+      "date": "2026-08-02",
+      "text": "Ellis Park, Pucker Up S. presented by Ag Revolution (Listed) — 4th"
+    }
+  ],
+  "createdAt": 1756000000000
+}
