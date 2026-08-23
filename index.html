@@ -177,8 +177,11 @@
   details[open] summary:before{content:"▾ ";}
 
   .log-list{margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;}
-  .log-list li{font-size:0.83rem;border-left:2px solid var(--brass);padding-left:10px;}
+  .log-list li{font-size:0.83rem;border-left:2px solid var(--brass);padding-left:10px;display:flex;justify-content:space-between;gap:8px;align-items:flex-start;}
+  .log-list li .entry-text{flex:1;}
   .log-list li .d{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--slate);display:block;}
+  .log-del{background:none;border:none;color:var(--slate);cursor:pointer;font-size:0.9rem;line-height:1;padding:2px 4px;flex-shrink:0;}
+  .log-del:hover{color:var(--oxblood);}
   .log-add{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
   .log-add input[type=date]{width:140px;}
   .log-add input[type=text]{flex:1;min-width:120px;}
@@ -328,13 +331,13 @@ function seedFillies(){
       price: 38968, ownership: 'Blue Bird Stables, Eclipse Thoroughbred Partners, and Ken T. Reimer (partnership)',
       sale: 'Goffs Orby Sale (GOFORY), Hip 100, Yearling — consigned by Boherguy Stud, bought by Blue Bird Stables',
       scores: { sire: 0, damSide: 0, cross: 0, market: 0 },
-      notes: 'By Mehmas out of Bandiuc Eile (IRE), by New Approach (IRE). Trainer Brian A. Lynch, jockey Tyler Gaffalione. Bred by J.S. Bolger. Best class achieved: stakes placed. Career: 5 starts, 2-1-0, $141,244 (all in 2026) against a $38,968 yearling buy — well in the black already.',
+      notes: 'By Mehmas out of Bandiuc Eile (IRE), by New Approach (IRE). Trainer Brian A. Lynch, jockey mostly Irad Ortiz Jr. (Luis Saez at Indy, Tyler Gaffalione at Ellis). Bred by J.S. Bolger. Best class achieved: stakes placed. Career: 5 starts, 2-1-0, $141,244 (all in 2026) against a $38,968 yearling buy — well in the black already. Progression: MSW win, then allowance win, then stepped into stakes company — 5th in her stakes debut (Cleopatra, Black Type) as the heavy favorite, then 2nd in the Tepin (Listed) rallying from off the pace, then 4th in the Pucker Up (Listed) after gate trouble.',
       log: [
-        {date:'2026-02-26', text:'Gulfstream Park, Maiden Special Weight — won'},
-        {date:'2026-04-09', text:'Keeneland, Allowance — won'},
-        {date:'2026-05-13', text:'Horseshoe Indianapolis, Cleopatra Handicap (Black Type) — 5th'},
-        {date:'2026-06-27', text:'Churchill Downs, Tepin Stakes (Listed) — 2nd'},
-        {date:'2026-08-02', text:'Ellis Park, Pucker Up S. presented by Ag Revolution (Listed) — 4th'}
+        {date:'2026-02-26', text:'Gulfstream Park, Maiden Special Weight, 1m turf — won by a neck as the 9.20 second choice. Set a soft pace, pressed by Bullet Journal through the stretch, exchanged bumps and dug back in to prevail under a drive. Fractions 23.21/48.46/1:12.57, final 1:35.77.'},
+        {date:'2026-04-09', text:'Keeneland, Allowance, 1 1/16m turf — won by 2 1/2 as the 3.69 favorite. Stalked early, tipped out to bid at the 5/16 pole, took over in the lane and drew off under a hand ride.'},
+        {date:'2026-05-13', text:'Horseshoe Indianapolis, Cleopatra H. (Black Type), 1m turf — 5th, beaten 2 1/4 as the 0.80 heavy favorite. Stakes debut. Pressed the pace three wide, bid at the 1/8 pole, faltered late.'},
+        {date:'2026-06-27', text:'Churchill Downs, Tepin S. (Listed), 1m turf — 2nd, beaten 3/4 to Tam Tam as the 4.18 second choice. Bumped at the start, raced off the pace for the first time, circled six wide entering the lane and rallied for place.'},
+        {date:'2026-08-02', text:'Ellis Park, Pucker Up S. presented by Ag Revolution (Listed), 1 1/8m turf — 4th, beaten 2 3/4 as the 1.72 favorite. Got fractious in the gate, re-cleared by a vet before loading; still set the pace and dueled gamely before yielding late to Bohemian.'}
       ],
       createdAt: 1756000000000
     },
@@ -344,16 +347,16 @@ function seedFillies(){
       price: 90000, ownership: 'Blue Bird Stables (partnership)',
       sale: 'Fasig-Tipton October (FTKOCT), Hip 198, Yearling — consigned by Hunter Valley Farm, bought by Blue Bird Stables for $90,000. First RNA\u2019d at Keeneland September (Hip 439) on a $120,000 reserve.',
       scores: { sire: 0, damSide: 0, cross: 0, market: 0 },
-      notes: "By Kitten's Joy out of Hidden Message, by Scat Daddy. Trainer Kevin Attard. Bred by Qatar Racing, LLC. Career: 8 starts, 2-0-2, $87,663 against a $90,000 yearling buy.",
+      notes: "By Kitten's Joy out of Hidden Message, by Scat Daddy. Bred by Qatar Racing, LLC. Trainer Brendan Walsh early on, moved to Kevin Attard's barn (Woodbine) mid-2026. Career: 8 starts, 2-0-2, $87,663 against a $90,000 yearling buy (after RNA'ing at a $120,000 reserve at Keeneland September first). Full progression: rough 2yo campaign (5th, 7th in her first two, both as a short-priced runner), found her stride at 3 with back-to-back thirds, broke through for the maiden win at Fair Grounds in January 2026, ran flat (8th, last) in her stakes debut in March, then a flat 5th in her first Woodbine start for Attard before a standout last-to-first sweep to win going away in August.",
       log: [
-        {date:'2025-08-03', text:'Ellis Park, Maiden Special Weight — 5th'},
-        {date:'2025-08-30', text:'Kentucky Downs, Maiden Special Weight — 7th'},
-        {date:'2025-11-29', text:'Fair Grounds, Maiden Special Weight — 3rd'},
-        {date:'2026-01-03', text:'Fair Grounds, Maiden Special Weight — 3rd'},
-        {date:'2026-01-31', text:'Fair Grounds, Maiden Special Weight — won'},
-        {date:'2026-03-07', text:'Fair Grounds, Allen Black Cat LaCombe Memorial Stakes (Black Type) — 8th'},
-        {date:'2026-07-30', text:'Woodbine, Allowance Optional Claiming — 5th'},
-        {date:'2026-08-22', text:'Woodbine, Allowance Optional Claiming — won'}
+        {date:'2025-08-03', text:'Ellis Park, Maiden Special Weight, 1 1/16m turf — career debut, 5th beaten a head for 4th as the 4.66 second choice. Brushed at the start, saved ground back of the pack, shifted out five wide in upper stretch for a belated kick.'},
+        {date:'2025-08-30', text:"Kentucky Downs, Maiden Special Weight, 1m turf — 7th as the 2.96 favorite off her debut effort. Unhurried early, raced three wide through the far turn, swung out six wide into the lane and couldn't sustain the bid."},
+        {date:'2025-11-29', text:'Fair Grounds, Maiden Special Weight, 1m turf — 3rd, beaten a head for 2nd, at 5.50. Settled off the pace four wide, rallied seven wide through the far turn, pressed late but had no closing bid.'},
+        {date:'2026-01-03', text:'Fair Grounds, Maiden Special Weight, 1 1/16m turf — 3rd, beaten 3 1/2, at 9.40. Off the pace early, rallied along the inside in the stretch for the show award.'},
+        {date:'2026-01-31', text:'Fair Grounds, Maiden Special Weight, 1 1/16m turf — first career win, by 1 1/2 as the 4.00 second choice. Cued four wide in the far turn, saved ground into the stretch, took over at the eighth and drew off.'},
+        {date:'2026-03-07', text:'Fair Grounds, Allen Black Cat LaCombe Memorial S. (Black Type), 1 1/16m turf — 8th (last), stakes debut, sent off at 9.90. Saved ground early, no factor in the stretch — the step up in class didn\u2019t suit.'},
+        {date:'2026-07-30', text:'Woodbine, Allowance Optional Claiming, 1 1/16m all-weather — 5th beaten 5 1/2 as the 10.50 chance. First start for the Attard barn. Settled off the pace inside, angled five to six wide turning for home, kept on late but never got competitive.'},
+        {date:'2026-08-22', text:'Woodbine, Allowance Optional Claiming, 1 1/16m all-weather — won by 1 1/2 as the 4.00 chance. Dead last early and unhurried, angled five wide at the top of the stretch and swept past the whole field in the lane, picking horses off one by one to win going away. Best performance of her career.'}
       ],
       createdAt: 1757000000000
     },
@@ -363,10 +366,10 @@ function seedFillies(){
       price: 65000, ownership: 'Blue Bird Stables (partnership)',
       sale: 'Fasig-Tipton July (FTKJUL), Hip 39, Yearling — consigned by Burleson Farms, bought by Blue Bird Stables',
       scores: { sire: 0, damSide: 0, cross: 0, market: 0 },
-      notes: 'By Lexitonian out of Indian Princess, by Indian Charlie. Trainer Todd A. Pletcher. Bred by Mercedes Stables LLC. Career: 2 starts, 1-0-0, $51,404 against a $65,000 yearling buy.',
+      notes: 'By Lexitonian out of Indian Princess, by Indian Charlie. Trainer Todd A. Pletcher. Bred by Mercedes Stables LLC. Career: 2 starts, 1-0-0, $51,404 against a $65,000 yearling buy. Debuted on the dirt at Gulfstream (5th, bumped and tired late), then romped by 9 in a conditions-restricted maiden at Keeneland (for horses that sold or RNA\u2019d for $65,000 or less at their last auction) — a condition her own $65,000 sale price qualified her for.',
       log: [
-        {date:'2026-03-01', text:'Gulfstream Park, Maiden Special Weight — 5th'},
-        {date:'2026-04-17', text:'Keeneland, Maiden Special Weight — won'}
+        {date:'2026-03-01', text:'Gulfstream Park, Maiden Special Weight, 1m dirt — career debut, 5th beaten 5 1/2 as the 2.30 second choice. Bumped at the break, tracked the pace four wide, tired in the stretch.'},
+        {date:'2026-04-17', text:'Keeneland, Maiden Special Weight, 7f dirt (restricted to $65,000-or-less sale horses) — first career win, drawing off by 9 as the 6.42 chance. Stalked three wide, took over around the turn and cruised home under a hand ride.'}
       ],
       createdAt: 1758000000000
     }
@@ -463,7 +466,7 @@ function render(){
 function cardHtml(f, lotNum){
   const total = scoreTotal(f.scores);
   const has = hasScore(f.scores);
-  const logItems = (f.log||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  const logItems = (f.log||[]).map((l,i)=>({...l, _idx:i})).sort((a,b)=>b.date.localeCompare(a.date));
   return `
   <div class="card">
     <div class="card-top">
@@ -484,7 +487,7 @@ function cardHtml(f, lotNum){
     <details>
       <summary>Workouts &amp; past performances (${(f.log||[]).length})</summary>
       <ul class="log-list">
-        ${logItems.length? logItems.map(l=>`<li><span class="d">${esc(l.date)}</span>${esc(l.text)}</li>`).join('') : '<li style="border:none;padding-left:0;color:var(--slate);">No entries yet — add them once she starts training or racing.</li>'}
+        ${logItems.length? logItems.map(l=>`<li><span class="entry-text"><span class="d">${esc(l.date)}</span>${esc(l.text)}</span><button class="log-del" title="Delete entry" onclick="deleteLogEntry('${f.id}', ${l._idx})">×</button></li>`).join('') : '<li style="border:none;padding-left:0;color:var(--slate);">No entries yet — add them once she starts training or racing.</li>'}
       </ul>
       <div class="log-add">
         <input type="date" id="logDate-${f.id}">
@@ -519,6 +522,19 @@ async function addLog(id){
     f._sha = result.content.sha;
     render();
   }catch(e){ alert('Could not save the log entry: '+e.message); }
+}
+
+async function deleteLogEntry(id, idx){
+  const cfg = getConfig();
+  const f = fillies.find(x=>x.id===id);
+  if(!f) return;
+  const updated = {...f, log: (f.log||[]).filter((_,i)=>i!==idx)};
+  try{
+    const result = await ghPutFile(cfg, f._path, stripInternal(updated), f._sha);
+    f.log = updated.log;
+    f._sha = result.content.sha;
+    render();
+  }catch(e){ alert('Could not delete the log entry: '+e.message); }
 }
 
 async function deleteFilly(id){
