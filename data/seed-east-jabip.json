@@ -1,0 +1,41 @@
+{
+  "id": "seed-east-jabip",
+  "cohort": "2024",
+  "name": "East Jabip (IRE)",
+  "sire": "Mehmas",
+  "dam": "Bandiuc Eile (IRE)",
+  "foaled": "2023-03-21",
+  "price": 38968,
+  "ownership": "Blue Bird Stables, Eclipse Thoroughbred Partners, and Ken T. Reimer (partnership)",
+  "sale": "Goffs Orby Sale (GOFORY), Hip 100, Yearling — consigned by Boherguy Stud, bought by Blue Bird Stables",
+  "scores": {
+    "sire": 0,
+    "damSide": 0,
+    "cross": 0,
+    "market": 0
+  },
+  "notes": "By Mehmas out of Bandiuc Eile (IRE), by New Approach (IRE). Trainer Brian A. Lynch, jockey mostly Irad Ortiz Jr. (Luis Saez at Indy, Tyler Gaffalione at Ellis). Bred by J.S. Bolger. Best class achieved: stakes placed. Career: 5 starts, 2-1-0, $141,244 (all in 2026) against a $38,968 yearling buy — well in the black already. Progression: MSW win, then allowance win, then stepped into stakes company — 5th in her stakes debut (Cleopatra, Black Type) as the heavy favorite, then 2nd in the Tepin (Listed) rallying from off the pace, then 4th in the Pucker Up (Listed) after gate trouble.",
+  "log": [
+    {
+      "date": "2026-02-26",
+      "text": "Gulfstream Park, Maiden Special Weight, 1m turf — won by a neck as the 9.20 second choice. Set a soft pace, pressed by Bullet Journal through the stretch, exchanged bumps and dug back in to prevail under a drive. Fractions 23.21/48.46/1:12.57, final 1:35.77."
+    },
+    {
+      "date": "2026-04-09",
+      "text": "Keeneland, Allowance, 1 1/16m turf — won by 2 1/2 as the 3.69 favorite. Stalked early, tipped out to bid at the 5/16 pole, took over in the lane and drew off under a hand ride."
+    },
+    {
+      "date": "2026-05-13",
+      "text": "Horseshoe Indianapolis, Cleopatra H. (Black Type), 1m turf — 5th, beaten 2 1/4 as the 0.80 heavy favorite. Stakes debut. Pressed the pace three wide, bid at the 1/8 pole, faltered late."
+    },
+    {
+      "date": "2026-06-27",
+      "text": "Churchill Downs, Tepin S. (Listed), 1m turf — 2nd, beaten 3/4 to Tam Tam as the 4.18 second choice. Bumped at the start, raced off the pace for the first time, circled six wide entering the lane and rallied for place."
+    },
+    {
+      "date": "2026-08-02",
+      "text": "Ellis Park, Pucker Up S. presented by Ag Revolution (Listed), 1 1/8m turf — 4th, beaten 2 3/4 as the 1.72 favorite. Got fractious in the gate, re-cleared by a vet before loading; still set the pace and dueled gamely before yielding late to Bohemian."
+    }
+  ],
+  "createdAt": 1756000000000
+}
