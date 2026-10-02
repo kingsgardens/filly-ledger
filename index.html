@@ -143,6 +143,12 @@
     border-radius:4px;padding:18px 18px 16px;box-shadow:var(--shadow);
     display:flex;flex-direction:column;gap:10px;
   }
+  .card-photo{
+    width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:3px;
+    border:1px solid var(--line);cursor:pointer;display:block;margin-bottom:2px;
+    background:var(--line);
+  }
+  .card-photo:hover{outline:2px solid var(--brass);outline-offset:1px;}
   .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
   .lot-tag{
     font-family:'IBM Plex Mono',monospace;font-size:0.72rem;letter-spacing:0.06em;
@@ -209,6 +215,28 @@
   .btn-primary{background:var(--turf);color:var(--parchment);border:none;padding:10px 18px;border-radius:3px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;font-size:0.86rem;}
   .btn-primary:hover{background:var(--turf-deep);}
   .btn-primary[disabled]{opacity:0.6;cursor:default;}
+
+  .lightbox-overlay{
+    position:fixed;inset:0;background:rgba(20,24,18,0.82);
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+    padding:24px 16px;overflow-y:auto;z-index:60;
+  }
+  .lightbox-bar{
+    display:flex;gap:8px;align-items:center;justify-content:space-between;
+    width:100%;max-width:900px;margin-bottom:14px;
+  }
+  .lightbox-tabs{display:flex;gap:8px;}
+  .lightbox-tab{
+    background:none;border:1px solid var(--parchment);color:var(--parchment);
+    padding:7px 16px;border-radius:18px;cursor:pointer;font-family:'Inter',sans-serif;
+    font-weight:600;font-size:0.82rem;
+  }
+  .lightbox-tab.active{background:var(--parchment);color:var(--turf);}
+  .lightbox-close{
+    background:none;border:none;color:var(--parchment);font-size:1.6rem;cursor:pointer;
+    line-height:1;padding:0 6px;
+  }
+  .lightbox-img{max-width:900px;width:100%;border-radius:4px;box-shadow:0 12px 40px rgba(0,0,0,0.4);}
 
   .status-msg{text-align:center;color:var(--slate);font-size:0.85rem;padding:30px;}
   .error-msg{text-align:center;color:var(--oxblood);font-size:0.85rem;padding:16px;border:1px solid var(--oxblood);border-radius:4px;background:rgba(122,39,50,0.06);margin-bottom:20px;}
@@ -321,6 +349,7 @@ function seedFillies(){
       name: 'Lot 412', sire: 'Australia (GB)', dam: 'Cappoquin (IRE)', foaled: '2025-02-14',
       price: 238119, ownership: '34% partnership \u2014 effective exposure ~$80,960 (bought \u20ac210,000, converted at ~1.1339 EUR/USD)',
       sale: 'Goffs Orby Sale Book 1 2026 (Kildare, Ireland) \u2014 consigned by Kildaragh Stud',
+      photo: 'images/lot412-photo.jpg', pedigree: 'images/lot412-pedigree.jpg',
       scores: { sire: 34, damSide: 36, cross: 14, market: 8 },
       notes: "Australia (GB) is an elite Classic winner (Epsom Derby, Irish Derby, Juddmonte International) by Galileo out of 7-time G1 winner Ouija Board. Currently hot at stud: 2 individual G1 winners in 2025 alone (Lambourn \u2014 Epsom/Irish Derby double; Cercene \u2014 Coronation Stakes). Stands at Coolmore for a modest \u20ac15,000, cheap relative to his output. Dam Cappoquin is a winner herself (not black type); this is her first foal. Female family is exceptional and continuously producing: 2nd dam Tecla (5/6 winners) headlined by Givemethebeatboys (multi-Gr.3, Gr.1-placed); 3rd dam Mahalia (8/13 winners) includes Johnny Barnes (Gr.3 winner, Gr.1-placed, sire), and a branch to Meditate (Breeders' Cup Juvenile Fillies Turf, G1) plus another to Ectot (2x G1 winner, now a sire). Clean cross (Galileo line onto Oasis Dream-line broodmare sire via Muhaarar). Bid to \u20ac210,000 at auction but marked WITHDRAWN on the Goffs board \u2014 completed as a private deal afterward at that price.",
       log: [],
@@ -331,6 +360,7 @@ function seedFillies(){
       name: 'Hip 2704', sire: 'Blame', dam: 'La Bombalina', foaled: '2025-04-21',
       price: 220000, ownership: '50/50 partnership with Claiborne Farm \u2014 effective exposure $110,000',
       sale: 'Keeneland September Yearling Sale 2026 — consigned by Nicky Drion Thoroughbreds, Agent',
+      photo: 'images/hip2704-photo.jpg', pedigree: 'images/hip2704-pedigree.jpg',
       scores: { sire: 36, damSide: 37, cross: 14, market: 8 },
       notes: "Blame (Arch) is a fully proven, mature sire (Eclipse Champion Older Horse, Breeders' Cup Classic winner) at stud since 2011: 13 crops, 5 individual G1 winners (Wet Paint, Marley's Freedom, Nadal, Senga, Fault), $61.8M progeny earnings, just passed his 50th stakes winner. Also proving out as a broodmare sire \u2014 4 individual G1 winners from his daughters in 2025 alone. Stands at Claiborne for $25,000 (2026), a settled, known price. Dam La Bombalina is unraced/blank slate (1 other foal, not yet raced), but the female family is exceptional and currently active: 2nd dam Miss A. Bomb (stakes winner, set a track record) is granddam of Sumter, an actively-winning gelding in 2026 ($609,870, G3 winner, multiple graded placings). 3rd dam Aerturas produced a branch with 2 separate G1 winners (Red Bullet, granddaughter Silent Poet) plus another branch producing Cadenas [G2, $2.08M] and Suzuka Causeway [G2, $1.83M]. Recurring Group/Grade 1 quality across multiple branches, still producing at the top level today. Clean cross, no duplication.",
       log: [],
@@ -341,6 +371,7 @@ function seedFillies(){
       name: 'Hip 1823', sire: 'Gunite', dam: 'Gimmick', foaled: '2025-01-14',
       price: 130000, ownership: 'Partnership buy',
       sale: 'Keeneland September Yearling Sale 2026 — consigned by Heartwood Farm, Agent',
+      photo: 'images/hip1823-photo.jpg', pedigree: 'images/hip1823-pedigree.jpg',
       scores: { sire: 27, damSide: 33, cross: 14, market: 7 },
       notes: "Gunite (Gun Runner) is a true first-crop sire \u2014 this is his first-ever yearling crop, zero runners yet to judge him by \u2014 but his own race record is excellent: 9 wins, $2.49M, 2 individual G1s (Forego S., Hopeful S.), a G2, and 4 Listed wins. By Gun Runner, the hottest sire in America ($921K yearling avg). Early demand for his debut crop has been strong (toppers at $350K, $340K, $335K); $130,000 sits well below that ceiling. Dam Gimmick is graded-placed herself (3rd, Miss Preakness S. G3) \u2014 not a blank slate \u2014 and this is her first foal. The female family emphasizes fertility plus quality: 2nd dam Quick Flip produced 6 winners from 6 starters, headlined by Following Sea (multi-G1-placed, won the Vosburgh G2, 2nd in the Haskell and Cigar Mile, 3rd in the BC Sprint). Extra thread: Gunite's own dam Simple Surprise is a half-sister to Curlin. Clean cross, no duplication.",
       log: [],
@@ -351,6 +382,7 @@ function seedFillies(){
       name: 'Hip 1443', sire: 'Golden Pal', dam: 'Jazzique (IRE)', foaled: '2025-02-16',
       price: 175000, ownership: 'Partnership buy',
       sale: 'Keeneland September Yearling Sale 2026 — consigned by Lane\u2019s End, Agent',
+      photo: 'images/hip1443-photo.jpg', pedigree: 'images/hip1443-pedigree.jpg',
       scores: { sire: 28, damSide: 37, cross: 14, market: 8 },
       notes: "Golden Pal (Uncle Mo) was a brilliant racehorse himself (8-2-0 in 13, $1.8M+, multiple G1s incl. a Breeders' Cup Turf Sprint) but is early at stud \u2014 this filly is from his 2nd crop; his 1st-crop 2yos are just showing modest juvenile placings in 2026, nothing graded yet. His first-crop yearlings averaged $139,184 at Keeneland September last year. Dam Jazzique (IRE) is herself graded-placed (3rd, Miss Grillo S. G2) \u2014 not a blank slate. The female family is exceptional: 3rd dam Lagrion was Irish Broodmare of the Year in both 2006 and 2007, dam of Dylan Thomas (IRE) \u2014 Horse of the Year, Irish Derby, Irish Champion S. x2, King George VI & Queen Elizabeth S., Prix de l'Arc de Triomphe \u2014 plus Queen's Logic (G1 Cheveley Park, champion 2yo filly) and Homecoming Queen (G1 1000 Guineas). A more recent generation produced G1 winner Sahlan. Three individual Group/Grade 1 winners within 3 generations. $175,000 is a real premium over Golden Pal's yearling average, but pages this decorated regularly bring far more once the sire is established \u2014 his still-modest $20-25K fee likely kept this restrained.",
       log: [],
@@ -361,6 +393,7 @@ function seedFillies(){
       name: 'Hip 1433', sire: 'Girvin', dam: 'Honor the Moment', foaled: '2025-03-14',
       price: 100000, ownership: 'Partnership buy',
       sale: 'Keeneland September Yearling Sale 2026, Book 3 — consigned by Terrazas Thoroughbreds, Agent IV',
+      photo: 'images/hip1433-photo.jpg', pedigree: 'images/hip1433-pedigree.jpg',
       scores: { sire: 35, damSide: 29, cross: 13, market: 7 },
       notes: "Girvin (Tale of Ekati) died suddenly Aug 8, 2026 at Airdrie Stud, age 12 — one more crop still to come (2027 foals from his final book), then that's it, which supports demand on existing stock. Already a proven sire: 2 individual G1 winners (Dorth Vader, Faiza — the latter sold for $4M as a broodmare prospect), $18.8M progeny earnings from 5 crops. Fee had climbed from $7,500 to $30,000; a Girvin colt brought $725,000 on this sale's opening day. Dam Honor the Moment is unraced, first foal (blank slate), but 2nd dam Catch the Moment produced Grade 1 winner Smooth Roller (Awesome Again S.), and the female family traces to a half-sister of Secreto, the 1985 Epsom Derby winner, with recurring black type across 4 generations. $100,000 sits well below Girvin's recent yearling average ($139-157K) even as a Book 3 filly — reads as real value given the post-death demand bump.",
       log: [],
@@ -371,6 +404,7 @@ function seedFillies(){
       name: 'Hip 156', sire: 'Flameaway', dam: 'Rosalita', foaled: '2025-01-22',
       price: 130000, ownership: 'Partnership buy',
       sale: 'Grovendale Sales, agent for William B. Harrigan',
+      photo: 'images/hip156-photo.jpg', pedigree: 'images/hip156-pedigree.jpg',
       scores: { sire: 30, damSide: 25, cross: 13, market: 3 },
       notes: 'Sister to G3 winner Seek and Destroy on the immediate family; 2nd dam Search and Seizure unraced but dam of 7 winners across 3 generations of black type (Tammy the Torpedo, Seek and Destroy, High Opinion). Flameaway (Scat Daddy) is a leading third-crop sire (Bear River G2, Dark Saffron 2x G1), 2026 fee $10,000. Bought at $130,000 — well above his ~$16-24K recent yearling average, so this was a full/competitive price rather than a value catch.',
       log: [], createdAt: 1755000000000
@@ -525,6 +559,7 @@ function cardHtml(f, lotNum){
   const logItems = (f.log||[]).map((l,i)=>({...l, _idx:i})).sort((a,b)=>b.date.localeCompare(a.date));
   return `
   <div class="card">
+    ${f.photo?`<img class="card-photo" src="${esc(f.photo)}" alt="${esc(f.name||'Filly')} photo" onclick="openLightbox('${f.id}')" onerror="this.style.display='none'">`:''}
     <div class="card-top">
       <span class="lot-tag">LOT ${String(lotNum).padStart(2,'0')}</span>
       <span class="score-badge ${scoreClass(total,has)}">${has ? total+'/100 · '+scoreLabel(total,has) : 'Not scored'}</span>
@@ -557,6 +592,40 @@ function cardHtml(f, lotNum){
     </div>
   </div>`;
 }
+
+function openLightbox(id){
+  const f = fillies.find(x=>x.id===id);
+  if(!f || (!f.photo && !f.pedigree)) return;
+  const startTab = f.photo ? 'photo' : 'pedigree';
+  const overlay = document.createElement('div');
+  overlay.className = 'lightbox-overlay';
+  overlay.id = 'lightboxOverlay';
+  overlay.onclick = (e)=>{ if(e.target===overlay) closeLightbox(); };
+  overlay.innerHTML = `
+    <div class="lightbox-bar">
+      <div class="lightbox-tabs">
+        ${f.photo?`<button class="lightbox-tab" id="tabPhoto" onclick="switchLightboxTab('${f.id}','photo')">Photo</button>`:''}
+        ${f.pedigree?`<button class="lightbox-tab" id="tabPedigree" onclick="switchLightboxTab('${f.id}','pedigree')">Pedigree</button>`:''}
+      </div>
+      <button class="lightbox-close" onclick="closeLightbox()" title="Close">&times;</button>
+    </div>
+    <img class="lightbox-img" id="lightboxImg" src="" alt="">
+  `;
+  document.body.appendChild(overlay);
+  switchLightboxTab(id, startTab);
+}
+function switchLightboxTab(id, tab){
+  const f = fillies.find(x=>x.id===id);
+  if(!f) return;
+  const src = tab==='photo' ? f.photo : f.pedigree;
+  document.getElementById('lightboxImg').src = src || '';
+  document.getElementById('lightboxImg').alt = (f.name||'Filly') + ' ' + tab;
+  const pt = document.getElementById('tabPhoto');
+  const gt = document.getElementById('tabPedigree');
+  if(pt) pt.className = 'lightbox-tab' + (tab==='photo'?' active':'');
+  if(gt) gt.className = 'lightbox-tab' + (tab==='pedigree'?' active':'');
+}
+function closeLightbox(){ const o=document.getElementById('lightboxOverlay'); if(o) o.remove(); }
 
 function stripInternal(obj){
   const { _path, _sha, ...clean } = obj;
@@ -636,6 +705,10 @@ function openForm(id){
         <div class="field"><label>Your share / partnership note</label><input id="fOwnership" value="${f?esc(f.ownership):''}"></div>
       </div>
       <div class="field"><label>Sale &amp; consignor</label><input id="fSale" value="${f?esc(f.sale):''}"></div>
+      <div class="two-col">
+        <div class="field"><label>Photo URL (optional)</label><input id="fPhoto" placeholder="images/hip000-photo.jpg" value="${f?esc(f.photo):''}"></div>
+        <div class="field"><label>Pedigree image URL (optional)</label><input id="fPedigree" placeholder="images/hip000-pedigree.jpg" value="${f?esc(f.pedigree):''}"></div>
+      </div>
       <div class="field"><label>Pedigree notes</label><textarea id="fNotes">${f?esc(f.notes):''}</textarea></div>
       <div class="field">
         <label>Scoring (Sire 0–40 · Dam Side 0–40 · Cross 0–20 · Market 0–10) — leave blank if not scored</label>
@@ -683,6 +756,8 @@ async function submitForm(){
     price: Number(document.getElementById('fPrice').value)||0,
     ownership: document.getElementById('fOwnership').value.trim(),
     sale: document.getElementById('fSale').value.trim(),
+    photo: document.getElementById('fPhoto').value.trim(),
+    pedigree: document.getElementById('fPedigree').value.trim(),
     notes: document.getElementById('fNotes').value.trim(),
     scores: {
       sire: Number(document.getElementById('sSire').value)||0,
