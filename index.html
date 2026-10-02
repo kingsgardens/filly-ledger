@@ -282,9 +282,11 @@ let editingId = null;
 let activeCohort = '2026';
 
 function getConfig(){
+  // Defaults to this ledger's own public repo, read-only, so anyone opening
+  // the link sees it immediately with no setup. A token is only needed to edit.
   return {
-    owner: localStorage.getItem(LS_OWNER) || '',
-    repo: localStorage.getItem(LS_REPO) || '',
+    owner: localStorage.getItem(LS_OWNER) || 'kingsgardens',
+    repo: localStorage.getItem(LS_REPO) || 'filly-ledger',
     branch: localStorage.getItem(LS_BRANCH) || 'main',
     pat: localStorage.getItem(LS_PAT) || ''
   };
