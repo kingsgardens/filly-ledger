@@ -176,6 +176,15 @@
 
   .notes-preview{font-size:0.86rem;color:var(--ink);line-height:1.45;}
 
+  .sold-banner{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+    background:var(--turf);color:var(--parchment);border-radius:6px;padding:8px 12px;font-size:0.82rem;
+  }
+  .sold-banner b{font-family:'IBM Plex Mono',monospace;letter-spacing:0.08em;color:var(--brass);}
+  .sold-banner .sold-detail{font-family:'IBM Plex Mono',monospace;}
+  .sold-banner .pl.loss{color:#E8A0A8;}
+  .sold-banner .pl.gain{color:#9FD3B0;}
+
   details{margin-top:2px;}
   summary{cursor:pointer;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--turf);font-weight:600;list-style:none;}
   summary::-webkit-details-marker{display:none;}
@@ -446,7 +455,8 @@ function seedFillies(){
       id: 'seed-ontology', cohort: '2024',
       name: 'Ontology (KY)', sire: "Kitten's Joy", dam: 'Hidden Message', foaled: '2023-05-09',
       price: 90000, ownership: 'Blue Bird Stables (partnership)',
-      sale: 'Fasig-Tipton October (FTKOCT), Hip 198, Yearling — consigned by Hunter Valley Farm, bought by Blue Bird Stables for $90,000. First RNA\u2019d at Keeneland September (Hip 439) on a $120,000 reserve.',
+      sale: 'Fasig-Tipton October (FTKOCT), Hip 198, Yearling — consigned by Hunter Valley Farm, bought by Blue Bird Stables for $90,000. First RNA\u2019d at Keeneland September (Hip 439) on a $120,000 reserve. SOLD at Keeneland November (Hip 4043) for $70,000 to Peter Wilson.',
+      soldPrice: 70000, soldTo: 'Peter Wilson', soldDate: '2026-11',
       scores: { sire: 0, damSide: 0, cross: 0, market: 0 },
       notes: "By Kitten's Joy out of Hidden Message, by Scat Daddy. Bred by Qatar Racing, LLC. Trainer Brendan Walsh early on, moved to Kevin Attard's barn (Woodbine) mid-2026. Career: 8 starts, 2-0-2, $87,663 against a $90,000 yearling buy (after RNA'ing at a $120,000 reserve at Keeneland September first). Full progression: rough 2yo campaign (5th, 7th in her first two, both as a short-priced runner), found her stride at 3 with back-to-back thirds, broke through for the maiden win at Fair Grounds in January 2026, ran flat (8th, last) in her stakes debut in March, then a flat 5th in her first Woodbine start for Attard before a standout last-to-first sweep to win going away in August.",
       log: [
@@ -458,7 +468,8 @@ function seedFillies(){
         {date:'2026-03-07', text:'Fair Grounds, Allen Black Cat LaCombe Memorial S. (Black Type), 1 1/16m turf — 8th (last), stakes debut, sent off at 9.90. Saved ground early, no factor in the stretch — the step up in class didn\u2019t suit.'},
         {date:'2026-07-30', text:'Woodbine, Allowance Optional Claiming, 1 1/16m all-weather — 5th beaten 5 1/2 as the 10.50 chance. First start for the Attard barn. Settled off the pace inside, angled five to six wide turning for home, kept on late but never got competitive.'},
         {date:'2026-08-22', text:'Woodbine, Allowance Optional Claiming, 1 1/16m all-weather — won by 1 1/2 as the 4.00 chance. Dead last early and unhurried, angled five wide at the top of the stretch and swept past the whole field in the lane, picking horses off one by one to win going away. Best performance of her career.'},
-        {date:'2026-09-19', text:'Work: Woodbine, 4F all-weather, 48.60, breezing (ranked 22/48) \u2014 part of a steady string of works since her August win (9/12, 9/5, 8/15, 7/25 also logged), suggesting she\u2019s training toward another start.'}
+        {date:'2026-09-19', text:'Work: Woodbine, 4F all-weather, 48.60, breezing (ranked 22/48) \u2014 part of a steady string of works since her August win (9/12, 9/5, 8/15, 7/25 also logged), suggesting she\u2019s training toward another start.'},
+        {date:'2026-11-13', text:'SOLD at Keeneland November Breeding Stock Sale, Hip 4043 (sold as racing or broodmare prospect) \u2014 $70,000 to Peter Wilson, against the $90,000 yearling purchase price ($20,000 below cost before commissions and race earnings of $87,663).'}
       ],
       createdAt: 1757000000000
     },
@@ -566,6 +577,15 @@ function render(){
   content.innerHTML = `<div class="grid">${sorted.map((f,idx)=>cardHtml(f, sorted.length-idx)).join('')}</div>`;
 }
 
+function soldBannerHtml(f){
+  const sp = Number(f.soldPrice)||0;
+  if(!sp) return '';
+  const cost = Number(f.price)||0;
+  const diff = sp - cost;
+  const pl = cost ? `<span class="pl ${diff<0?'loss':'gain'}">${diff<0?'−':'+'}${fmtMoney(Math.abs(diff))} vs. cost</span>` : '';
+  return `<div class="sold-banner"><span><b>SOLD</b> ${esc(f.soldTo?'to '+f.soldTo:'')}${f.soldDate?' · '+esc(f.soldDate):''}</span><span class="sold-detail">${fmtMoney(sp)} ${pl}</span></div>`;
+}
+
 function cardHtml(f, lotNum){
   const total = scoreTotal(f.scores);
   const has = hasScore(f.scores);
@@ -587,6 +607,7 @@ function cardHtml(f, lotNum){
       <span class="price">${f.price ? fmtMoney(f.price) : 'Price n/a'}</span>
       <span class="ownership">${esc(f.ownership||'')}</span>
     </div>
+    ${soldBannerHtml(f)}
     ${f.notes?`<div class="notes-preview">${esc(f.notes)}</div>`:''}
     <details>
       <summary>Workouts &amp; past performances (${(f.log||[]).length})</summary>
@@ -719,6 +740,11 @@ function openForm(id){
       </div>
       <div class="field"><label>Sale &amp; consignor</label><input id="fSale" value="${f?esc(f.sale):''}"></div>
       <div class="two-col">
+        <div class="field"><label>Sold for ($) — if sold</label><input type="number" id="fSoldPrice" value="${f&&f.soldPrice?f.soldPrice:''}"></div>
+        <div class="field"><label>Sold to</label><input id="fSoldTo" value="${f&&f.soldTo?esc(f.soldTo):''}"></div>
+      </div>
+      <div class="field"><label>Sale date</label><input type="date" id="fSoldDate" value="${f&&f.soldDate?esc(f.soldDate):''}"></div>
+      <div class="two-col">
         <div class="field"><label>Photo URL (optional)</label><input id="fPhoto" placeholder="images/hip000-photo.jpg" value="${f?esc(f.photo):''}"></div>
         <div class="field"><label>Pedigree image URL (optional)</label><input id="fPedigree" placeholder="images/hip000-pedigree.jpg" value="${f?esc(f.pedigree):''}"></div>
       </div>
@@ -769,6 +795,9 @@ async function submitForm(){
     price: Number(document.getElementById('fPrice').value)||0,
     ownership: document.getElementById('fOwnership').value.trim(),
     sale: document.getElementById('fSale').value.trim(),
+    soldPrice: Number(document.getElementById('fSoldPrice').value)||0,
+    soldTo: document.getElementById('fSoldTo').value.trim(),
+    soldDate: document.getElementById('fSoldDate').value,
     photo: document.getElementById('fPhoto').value.trim(),
     pedigree: document.getElementById('fPedigree').value.trim(),
     notes: document.getElementById('fNotes').value.trim(),
